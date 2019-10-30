@@ -1,19 +1,26 @@
-canvas=document.getElementById("canvas");
-ctx=canvas.getContext("2d");
+var canvas=document.getElementById("canvas");
+var ctx=canvas.getContext("2d");
+var canvas_c=document.getElementById("canvas-courbe");
+var ctx_c=canvas_c.getContext("2d");
 
 var tex=parseInt(canvas.width);
 var tey=parseInt(canvas.height);
+
+var tex_c=parseInt(canvas_c.width);
+var tey_c=parseInt(canvas_c.height);
 
 var dt=new Date();
 var dbg=dt.getTime();
 var tbg=10;
 
+var cappr=[];
+
 var mape={nom:"mape",rebond_bords:true,obstacles:[],objectif:[],pstart:[]};
 var persos=[];
-var nbp=30;
+var nbp=100;
 var nbo=40;
-var to=50;
-var tp=25;
+var to=40;
+var tp=15;
 
 var bvit=0.1;
 var bcvit=1;
@@ -42,13 +49,16 @@ function d_collide(r,rr){
 function dist(p,pp){ return Math.sqrt(((p.px+p.tx/2)-(pp.px+pp.tx/2))**2+((p.py+p.ty/2)-(pp.py+pp.ty/2))**2) }
 
 function gen(){
-	mape.objectif={px:Math.random()*(tex-50),py:Math.random()*(tey-50),tx:50,ty:50};
+	mape.objectif={px:Math.random()*(tex-50),py:Math.random()*(tey-50),tx:to,ty:to};
     mape.pstart=[50+Math.random()*(tex-100),50+Math.random()*(tey-100)];
+    while( dist(mape.objectif,{px:mape.pstart[0],py:mape.pstart[1],tx:0,ty:0}) < tex/2 ){
+        mape.pstart=[50+Math.random()*(tex-100),50+Math.random()*(tey-100)];
+    }
 	mape.obstacles=[];
 	for(x=0;x<nbo;x++){
 		var xx=Math.random()*tex;
 		var yy=Math.random()*tey
-		while( collide( {px:xx,py:yy,tx:to,ty:to} , mape.objectif ) || collide( {px:xx,py:yy,tx:to,ty:to} , {px:mape.pstart[0]-100,py:mape.pstart-100,tx:200,ty:200} )){
+		while( dist( {px:xx,py:yy,tx:to,ty:to} , mape.objectif ) < 200 || dist( {px:xx,py:yy,tx:to,ty:to} , {px:mape.pstart[0],py:mape.pstart,tx:0,ty:0} < 200 )){
 			var xx=Math.random()*tex;
 		    var yy=Math.random()*tey;
 		}
@@ -99,15 +109,17 @@ function trier(){
         dd[d].cl=[50,100,((nn-n)/nn*255)];
         n+=1
     }
-    value=parseInt(document.getElementById("dmin").innerHTML);
-    if(parseInt(ddd[0]) < parseInt(value)){
-        document.getElementById("dmin").innerHTML=ddd[0];
-    }
+    return ddd;
 }
 
 function aff(){
 	ctx.fillStyle="rgb(255,255,255)";
 	ctx.fillRect(0,0,tex,tey);
+	ctx.fillStyle="rgb(0,255,0)";
+	ctx.fillRect(mape.objectif.px,mape.objectif.py,mape.objectif.tx,mape.objectif.ty);
+	ctx.fillStyle="rgb(255,0,0)";
+	ctx.arc(mape.pstart[0], mape.pstart[1], tp, 0, 2 * Math.PI);
+	ctx.fill();
 	for( p of persos ){
 	    ctx.fillStyle="rgb("+p.cl[0]+","+p.cl[1]+","+p.cl[2]+")";
 	    if( active_trace ){
@@ -127,8 +139,6 @@ function aff(){
 	for(o of mape.obstacles){
 		ctx.fillRect(o.px,o.py,o.tx,o.ty);
 	}
-	ctx.fillStyle="rgb(0,255,0)";
-	ctx.fillRect(mape.objectif.px,mape.objectif.py,mape.objectif.tx,mape.objectif.ty);
 }
 
 function baisseVit(v,b){
@@ -195,6 +205,31 @@ function update(){
 	}
 }
 
+function aff_courbe(){
+    ctx_c.fillStyle="rgb(255,255,255)";
+    ctx_c.fillRect(0,0,tex_c,tey_c);
+    ctx_c.strokeStyle="rgb(0,0,0)";
+    var db=20;
+    ctx_c.beginPath();
+    ctx_c.moveTo(db,db);
+    ctx_c.lineTo(db,tey_c-db);
+    ctx_c.stroke();
+    ctx_c.beginPath();
+    ctx_c.moveTo(db,tey_c-db);
+    ctx_c.lineTo(tex_c-db,tey_c-db);
+    ctx_c.stroke();
+    ctx_c.strokeStyle="rgb(255,0,0)";
+    ctx_c.beginPath();
+    n=0;
+    nt=cappr.length;
+    for(p of cappr){
+        ctx_c.lineTo(  db + ( n/cappr.length* ( tex-db*2 ) ) ,( (tey-db)-(p/1000.0*(tey-db*2) ) ) );
+        n+=1;
+    }
+    ctx_c.stroke();
+    
+}
+
 function main(){
 	gen();
 	function boucle(){
@@ -205,7 +240,7 @@ function main(){
 			update();
 			ps={};
 			for(p of persos){
-			    p.ap.push([p.px+p.tx/2,p.py+p.ty/2]);
+			    if(active_trace) p.ap.push([p.px+p.tx/2,p.py+p.ty/2]);
 				if(p.vitx==0 && p.vity==0){
 					ps[dist(p,mape.objectif)]=[p.bvitx,p.bvity];
 					if(collide(p,mape.objectif)){
@@ -213,8 +248,14 @@ function main(){
             		}
 				}
 			}
-            trier();
+            var ddd=trier();
+            aff_courbe();
 			if(Object.keys(ps).length==persos.length){
+			    cappr.push(ddd[0]);
+			    value=parseInt(document.getElementById("dmin").innerHTML);
+                if(parseInt(ddd[0]) < parseInt(value)){
+                    document.getElementById("dmin").innerHTML=ddd[0];
+                }
 			    if(fini) encour=false;
 				else ev();
 			}
