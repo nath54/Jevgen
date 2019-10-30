@@ -93,7 +93,8 @@ function trier(){
     var n=0;
     var nn=ddd.length;
     for( d of ddd ){
-    
+        dd[d].cl=[(n/nn*255),0,((nn-n)/nn*255)];];
+        n+=1
     }
 }
 
@@ -203,6 +204,7 @@ function main(){
 					ps[dist(p,mape.objectif)]=[p.bvitx,p.bvity];
 				}
 			}
+                        trier();
 			if(Object.keys(ps).length==persos.length){
 			    if(fini) encour=false;
 				else ev();
