@@ -52,7 +52,7 @@ function gen(){
 		}
 		mape.obstacles.push({px:xx,py:yy,tx:to,ty:to});
 	}
-	for( x=0; x<nbp ; x++){
+	for( w=0; w<nbp ; w++){
 		var vx=(-1000.0+Math.random()*2000.0)/100.0;
 		var vy=(-1000.0+Math.random()*2000.0)/100.0;
 		persos.push( { px : mape.pstart[0] , py : mape.pstart[1] , tx:tp , ty:tp , vitx:vx , vity:vy , bvitx:vx , bvity:vy , ap:[] , cl:[0,0,255] } );
@@ -63,14 +63,22 @@ function gen(){
 function ev(){
     var vv=Object.keys(ps).sort()
     var valeurs=[];
-    for(x=0;x<vv.length*5/100;x++){
-        valeurs.push(ps[vv]);
+    for(x=0;x<vv.length*10/100;x++){
+        valeurs.push(ps[vv[x]]);
     }
     persos=[];
-	for( x=0; x<nbp ; x++){
-	    vvv=valeurs[parseInt(Math.random()*valeurs.length)];
-		var vx=vvv[0]+(-100.0+Math.random()*200)/100.0;
-		var vy=vvv[1]+(-100.0+Math.random()*200)/100.0;
+	for( w=0; w<nbp ; w++){
+	    try{
+    	    var f=parseInt(Math.random()*valeurs.length);
+	        vvv=valeurs[f];
+	    	var vx=vvv[0]+(-100.0+Math.random()*200)/100.0;
+	    	var vy=vvv[1]+(-100.0+Math.random()*200)/100.0;
+	    }
+	    catch{
+	        console.log("ERROR");
+	        var vx=(-1000.0+Math.random()*2000.0)/100.0;
+    		var vy=(-1000.0+Math.random()*2000.0)/100.0;
+	    }
 		persos.push({px:mape.pstart[0],py:mape.pstart[1],tx:tp,ty:tp,vitx:vx,vity:vy,bvitx:vx,bvity:vy,ap:[],cl:[0,0,255]})
 	}
 	nbgen+=1;
@@ -175,7 +183,7 @@ function main(){
 			dbg=dt.getTime();
 			aff();
 			update();
-			ps={}
+			ps={};
 			for(p of persos){
 			    p.ap.push([p.px+p.tx/2,p.py+p.ty/2]);
 				if(p.vitx==0 && p.vity==0){
@@ -183,7 +191,7 @@ function main(){
 				}
 			}
 			if(Object.keys(ps).length==persos.length){
-				setTimeout( ev , 1000 );
+				ev();
 			}
 		}
 		if(encour) window.requestAnimationFrame(boucle);
