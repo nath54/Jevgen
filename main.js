@@ -225,7 +225,7 @@ function aff_courbe(){
     n=0;
     nt=cappr.length-1;
     for(p of cappr){
-        ctx_c.lineTo(  db + ( n/cappr.length* ( tex-db*2 ) ) ,( (tey-db)-(p/1300*(tey-db*2) ) ) );
+        ctx_c.lineTo(  db + ( n/nt* ( tex-db*2 ) ) ,( (tey-db)-(p/1300*(tey-db*2) ) ) );
         n+=1;
     }
     ctx_c.stroke();
