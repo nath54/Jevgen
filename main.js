@@ -209,7 +209,7 @@ function aff_courbe(){
     ctx_c.fillStyle="rgb(255,255,255)";
     ctx_c.fillRect(0,0,tex_c,tey_c);
     ctx_c.strokeStyle="rgb(0,0,0)";
-    ctx.lineWidth = 5;
+    ctx_c.lineWidth = 5;
     var db=20;
     ctx_c.beginPath();
     ctx_c.moveTo(db,db);
@@ -220,7 +220,7 @@ function aff_courbe(){
     ctx_c.lineTo(tex_c-db,tey_c-db);
     ctx_c.stroke();
     ctx_c.strokeStyle="rgb(255,0,0)";
-    ctx.lineWidth = 3;
+    ctx_c.lineWidth = 3;
     ctx_c.beginPath();
     n=0;
     nt=cappr.length-1;
