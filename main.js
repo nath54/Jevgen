@@ -61,7 +61,7 @@ function gen(){
 
 
 function ev(){
-    var vv=Object.keys(ps).sort()
+    var vv=Object.keys(ps).sort();
     var valeurs=[];
     for(x=0;x<vv.length*5/100;x++){
         valeurs.push(ps[vv[x]]);
@@ -82,6 +82,19 @@ function ev(){
 		persos.push({px:mape.pstart[0],py:mape.pstart[1],tx:tp,ty:tp,vitx:vx,vity:vy,bvitx:vx,bvity:vy,ap:[],cl:[0,0,255]})
 	}
 	nbgen+=1;
+}
+
+function trier(){
+    var dd={};
+    for(p of persos){
+        dd[dist(p,mape.objectif)]=p;
+    }
+    var ddd=Object.keys(dd).sort();
+    var n=0;
+    var nn=ddd.length;
+    for( d of ddd ){
+    
+    }
 }
 
 function aff(){
