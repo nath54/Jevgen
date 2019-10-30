@@ -22,6 +22,8 @@ var nbgen=1;
 var encour=true;
 var fini=false;
 
+var active_trace=false;
+
 var ps={};
 
 function collide(rect1,rect2){
@@ -37,7 +39,7 @@ function d_collide(r,rr){
 	return sens
 }
 
-function dist(p,pp){ return Math.sqrt((p.px-pp.px)**2+(p.py-pp.py)**2) }
+function dist(p,pp){ return Math.sqrt(((p.px+p.tx/2)-(pp.px+pp.tx/2))**2+((p.py+p.ty/2)-(pp.py+pp.ty/2))**2) }
 
 function gen(){
 	mape.objectif={px:Math.random()*(tex-50),py:Math.random()*(tey-50),tx:50,ty:50};
@@ -46,7 +48,7 @@ function gen(){
 	for(x=0;x<nbo;x++){
 		var xx=Math.random()*tex;
 		var yy=Math.random()*tey
-		while( collide( {px:xx,py:yy,tx:to,ty:to} , mape.objectif ) && collide( {px:xx,py:yy,tx:to,ty:to} , {px:mape.pstart[0]-50,py:mape.pstart-50,tx:100,ty:100} )){
+		while( collide( {px:xx,py:yy,tx:to,ty:to} , mape.objectif ) || collide( {px:xx,py:yy,tx:to,ty:to} , {px:mape.pstart[0]-100,py:mape.pstart-100,tx:200,ty:200} )){
 			var xx=Math.random()*tex;
 		    var yy=Math.random()*tey;
 		}
@@ -93,8 +95,13 @@ function trier(){
     var n=0;
     var nn=ddd.length;
     for( d of ddd ){
-        dd[d].cl=[(n/nn*255),0,((nn-n)/nn*255)];];
+        //dd[d].cl=[(n/nn*255),0,((nn-n)/nn*255)];
+        dd[d].cl=[50,100,((nn-n)/nn*255)];
         n+=1
+    }
+    value=parseInt(document.getElementById("dmin").innerHTML);
+    if(parseInt(ddd[0]) < parseInt(value)){
+        document.getElementById("dmin").innerHTML=ddd[0];
     }
 }
 
@@ -103,15 +110,17 @@ function aff(){
 	ctx.fillRect(0,0,tex,tey);
 	for( p of persos ){
 	    ctx.fillStyle="rgb("+p.cl[0]+","+p.cl[1]+","+p.cl[2]+")";
-    	ctx.strokeStyle="rgb("+p.cl[0]+","+p.cl[1]+","+p.cl[2]+")";
-	    if( p.ap.length > 1){
-            ctx.beginPath();
-            ctx.moveTo(p.ap[0][0],p.ap[0][1]);
-    	    for( a of p.ap ){
-	            ctx.lineTo(a[0],a[1]);
+	    if( active_trace ){
+        	ctx.strokeStyle="rgb("+p.cl[0]+","+p.cl[1]+","+p.cl[2]+")";
+	        if( p.ap.length > 1){
+                ctx.beginPath();
+                ctx.moveTo(p.ap[0][0],p.ap[0][1]);
+        	    for( a of p.ap ){
+	                ctx.lineTo(a[0],a[1]);
+	            }
+	            ctx.stroke();
 	        }
-	        ctx.stroke();
-	    }
+        }
 		ctx.fillRect(p.px,p.py,p.tx,p.ty);
 	}
 	ctx.fillStyle="rgb(30,30,30)";
@@ -183,9 +192,6 @@ function update(){
 			    p.vity=baisseVit(p.vity,bvit);
 			 }
 		}
-		if(collide(p,mape.objectif)){
-			fini=true;
-		}
 	}
 }
 
@@ -202,18 +208,20 @@ function main(){
 			    p.ap.push([p.px+p.tx/2,p.py+p.ty/2]);
 				if(p.vitx==0 && p.vity==0){
 					ps[dist(p,mape.objectif)]=[p.bvitx,p.bvity];
+					if(collide(p,mape.objectif)){
+		            	fini=true;
+            		}
 				}
 			}
-                        trier();
+            trier();
 			if(Object.keys(ps).length==persos.length){
 			    if(fini) encour=false;
 				else ev();
 			}
 			document.getElementById("nbgen").innerHTML="Nbgen = "+nbgen;
-			document.getElementById("encour").innerHTML="Encour = "+encour;
 		}
 		if(encour) window.requestAnimationFrame(boucle);
-		else document.getElementById("textefin").innerHTML="Fini en "+nbgen+" génération";
+		else document.getElementById("textefin").innerHTML="L'objectif a été atteit en "+nbgen+" génération";
 	}
 	window.requestAnimationFrame(boucle);
 }
