@@ -63,7 +63,7 @@ function gen(){
 function ev(){
     var vv=Object.keys(ps).sort()
     var valeurs=[];
-    for(x=0;x<vv.length*10/100;x++){
+    for(x=0;x<vv.length*5/100;x++){
         valeurs.push(ps[vv[x]]);
     }
     persos=[];
@@ -191,10 +191,14 @@ function main(){
 				}
 			}
 			if(Object.keys(ps).length==persos.length){
-				ev();
+			    if(fini) encour=false;
+				else ev();
 			}
+			document.getElementById("nbgen").innerHTML="Nbgen = "+nbgen;
+			document.getElementById("encour").innerHTML="Encour = "+encour;
 		}
 		if(encour) window.requestAnimationFrame(boucle);
+		else document.getElementById("textefin").innerHTML="Fini en "+nbgen+" génération";
 	}
 	window.requestAnimationFrame(boucle);
 }
